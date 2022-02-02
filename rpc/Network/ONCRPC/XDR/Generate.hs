@@ -13,7 +13,7 @@ module Network.ONCRPC.XDR.Generate
 
 import           Control.Arrow ((***), (&&&))
 import qualified Data.ByteString.Lazy.Char8 as BSLC
-import           Data.Char (isAlpha, isUpper)
+import           Data.Char (isAlpha, isUpper, toUpper)
 import           Data.Maybe (fromMaybe, maybeToList)
 import qualified Language.Haskell.Exts.Build as HS
 import           Language.Haskell.Exts.Pretty (prettyPrintWithMode, PPHsMode(..), defaultMode)
@@ -93,7 +93,10 @@ descrType (TypeString  (VariableLength l)) = Just $       lengthType "String"   
 descrType (TypeOptional t) = HS.TyApp ()        (HS.TyCon () $ "XDR"!"Optional")      <$> specType t
 
 declType' :: Declaration -> HS.Type ()
-declType' (Declaration n t) = fromMaybe (error $ "nested data structures are not supported: " ++ show n) $ descrType t
+declType' (Declaration (n:name) t) =
+  case descrType t of
+    Just d -> d
+    Nothing -> HS.TyCon () $ "" ! (toUpper n : name)
 
 strictType :: HS.Type () -> HS.Type ()
 strictType = HS.TyBang () (HS.BangedTy ()) (HS.NoUnpackPragma ())
