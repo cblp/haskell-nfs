@@ -10,12 +10,13 @@ data ArrayLength
   = FixedLength    { arrayLength :: !XDR.Length }
   | VariableLength { arrayLength :: !XDR.Length -- ^defaulted to maxLength
     }
+  deriving (Show)
 
 data TypeDescriptor
   = TypeSingle
     { descriptorType :: !TypeSpecifier
     }
-  | TypeArray 
+  | TypeArray
     { descriptorType :: !TypeSpecifier
     , descriptorLength :: !ArrayLength
     }
@@ -28,6 +29,7 @@ data TypeDescriptor
   | TypeOptional
     { descriptorType :: !TypeSpecifier
     }
+  deriving (Show)
 
 data TypeSpecifier
   = TypeInt
@@ -42,12 +44,14 @@ data TypeSpecifier
   | TypeStruct !StructBody
   | TypeUnion !UnionBody
   | TypeIdentifier !String
+  deriving (Show)
 
 -- |Non-void declaration
 data Declaration = Declaration
   { declarationIdentifier :: !String
   , declarationType :: TypeDescriptor
   }
+  deriving (Show)
 
 -- |'Declaration' or void
 type OptionalDeclaration = Maybe Declaration
@@ -57,6 +61,7 @@ type EnumValues = [(String, XDR.Int)]
 newtype EnumBody = EnumBody
   { enumValues :: EnumValues
   }
+  deriving (Show)
 
 boolValues :: EnumValues
 boolValues = [("FALSE", 0), ("TRUE", 1)]
@@ -64,17 +69,20 @@ boolValues = [("FALSE", 0), ("TRUE", 1)]
 newtype StructBody = StructBody
   { structMembers :: [Declaration] -- ^with voids elided
   }
+  deriving (Show)
 
 data UnionArm = UnionArm
   { unionCaseIdentifier :: String -- ^The literal string found after "case", for labeling
   , unionDeclaration :: OptionalDeclaration
   }
+  deriving (Show)
 
 data UnionBody = UnionBody
   { unionDiscriminant :: !Declaration
   , unionCases :: [(XDR.Int, UnionArm)]
   , unionDefault :: Maybe UnionArm
   }
+  deriving (Show)
 
 data Procedure = Procedure
   { procedureRes :: Maybe TypeSpecifier
